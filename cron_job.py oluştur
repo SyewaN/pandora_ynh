@@ -1,0 +1,53 @@
+# cron_job.py
+import os
+import time
+import subprocess
+import sys
+
+def run_ai_tasks():
+    """Her 10 dakikada bir AI görevlerini çalıştır"""
+
+    print("=" * 60)
+    print(f"🤖 AI TASK BAŞLADI: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print("=" * 60)
+
+    # 1. Tahmin yap
+    print("\n🔮 1/2 - Tahmin yapılıyor...")
+    try:
+        result = subprocess.run(
+            [sys.executable, "predict_next_values.py"],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        print(result.stdout)
+        if result.returncode != 0:
+            print(f"❌ Tahmin hatası: {result.stderr}")
+    except Exception as e:
+        print(f"❌ Tahmin exception: {e}")
+
+    # 2. Anomali kontrol et
+    print("\n🚨 2/2 - Anomali kontrolü...")
+    try:
+        result = subprocess.run(
+            [sys.executable, "detect_anomaly.py"],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        print(result.stdout)
+        if result.returncode != 0:
+            print(f"❌ Anomali hatası: {result.stderr}")
+    except Exception as e:
+        print(f"❌ Anomali exception: {e}")
+
+    print("\n✅ AI TASK TAMAMLANDI\n")
+
+if __name__ == "__main__":
+    # İlk çalıştırma
+    run_ai_tasks()
+
+    # Sonsuz döngü - her 10 dakikada bir
+    while True:
+        time.sleep(600)  # 10 dakika
+        run_ai_tasks()
